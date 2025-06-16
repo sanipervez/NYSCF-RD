@@ -372,7 +372,8 @@ void update_sensor_readings() {
 
     sensirion_i2c_hal_sleep_usec(100000);
 
-    error = scd4x_get_data_ready_flag(&data_ready_flag);
+    error = scd4x_get_data_ready_status(&data_ready_flag);
+
 
     if (error || !data_ready_flag) {
 
@@ -383,12 +384,14 @@ void update_sensor_readings() {
 
     uint16_t co2;
 
-    float temperature;
+    int32_t temperature_raw, humidity_raw;
+    
+    error = scd4x_read_measurement(&co2, &temperature_raw, &humidity_raw);
+    
+    float temperature = temperature_raw / 1000.0f;
+    
+    float humidity = humidity_raw / 1000.0f;
 
-    float humidity;
-
-
-    error = scd4x_read_measurement(&co2, &temperature, &humidity);
 
     if (error || co2 == 0) {
 
