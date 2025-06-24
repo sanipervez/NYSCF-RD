@@ -514,169 +514,132 @@ void decrease_co2(GtkWidget *widget, gpointer data) {
 }
 
  // responsible for the visual display of the GUI
+static void on_dropdown_changed(GtkComboBoxText *combo, gpointer user_data) {
+    GtkStack *stack = GTK_STACK(user_data);
+    const gchar *selected = gtk_combo_box_text_get_active_text(combo);
+
+    if (g_strcmp0(selected, "Home") == 0) {
+        gtk_stack_set_visible_child_name(stack, "landing");
+    } else if (g_strcmp0(selected, "Sensor Dashboard") == 0) {
+        gtk_stack_set_visible_child_name(stack, "sensors");
+    } else if (g_strcmp0(selected, "Calibration") == 0) {
+        gtk_stack_set_visible_child_name(stack, "calibration");
+    } else if (g_strcmp0(selected, "File Setup") == 0) {
+        gtk_stack_set_visible_child_name(stack, "file_setup");
+    }
+}
 
 static void activate(GtkApplication *app, gpointer user_data) {
-
     GtkWidget *window;
+    GtkWidget *main_vbox;
+    GtkWidget *stack;
+    GtkWidget *dropdown;
 
-    GtkWidget *grid;
-
-    GtkWidget *binco2;
-
-    GtkWidget *bdeco2;
-
-    GtkWidget *bincco2;
-
-    GtkWidget *bdecco2;
-
-
-    GtkCssProvider *css_provider; // significant for styling 
-
-
-    // Create a new CSS provider
-
-    css_provider = gtk_css_provider_new();
-
-    gtk_css_provider_load_from_data(css_provider,
-
-        "label { font-size: 50px; }"  // Set the font size to 50px for labels
-
-        "button { font-size: 36px; }", // Set the font size to 36px for buttons
-
-        -1, NULL);
-
-
-    // Apply the CSS provider to the default screen
-
-    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
-
+    // Load CSS
+    GtkCssProvider *css_provider = gtk_css_provider_new();
+    GdkDisplay *display = gdk_display_get_default();
+    GdkScreen *screen = gdk_display_get_default_screen(display);
+    GError *error = NULL;
+    gtk_css_provider_load_from_path(css_provider, "style.css", &error);
+    if (error) {
+        g_warning("Failed to load CSS file: %s", error->message);
+        g_error_free(error);
+    }
+    gtk_style_context_add_provider_for_screen(
+        screen,
         GTK_STYLE_PROVIDER(css_provider),
+        GTK_STYLE_PROVIDER_PRIORITY_USER
+    );
 
-        GTK_STYLE_PROVIDER_PRIORITY_USER);
-
-
+    // Create the window
     window = gtk_application_window_new(app);
-
-    gtk_window_set_title(GTK_WINDOW(window), "Full Screen Window");
-
-    gtk_window_set_default_size(GTK_WINDOW(window), 1024, 600); // Set the default size
-
-
-    grid = gtk_grid_new();
-
-    gtk_container_add(GTK_CONTAINER(window), grid);
-
-
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 10); // Set row spacing
-
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 10); // Set column spacing
-
-
-    labelsample = gtk_label_new("Sample: 0");
-
-    gtk_grid_attach(GTK_GRID(grid), labelsample, 0, 0, 2, 1);  // setting location 
-
-    gtk_widget_set_hexpand(labelsample, TRUE); // horizontal expansion
-
-    gtk_widget_set_vexpand(labelsample, TRUE); // vertical expansion 
-
-// creation of buttons 
-
-    labelco2 = gtk_label_new("Carbon Dioxide: ");
-
-    labelo2 = gtk_label_new("Oxygen: ");
-
-    labeltemp = gtk_label_new("Temperature: ");
-
-    labelhum = gtk_label_new("Humidity: ");
-
-
-    gtk_grid_attach(GTK_GRID(grid), labeltemp, 0, 1, 1, 1);
-
-    gtk_widget_set_hexpand(labeltemp, TRUE);
-
-    gtk_widget_set_vexpand(labeltemp, TRUE);
-
-
-    gtk_grid_attach(GTK_GRID(grid), labelhum, 1, 1, 1, 1);
-
-    gtk_widget_set_hexpand(labelhum, TRUE);
-
-    gtk_widget_set_vexpand(labelhum, TRUE);
-
-
-    gtk_grid_attach(GTK_GRID(grid), labelco2, 0, 2, 1, 1);
-
-    gtk_widget_set_hexpand(labelco2, TRUE);
-
-    gtk_widget_set_vexpand(labelco2, TRUE);
-
-
-    gtk_grid_attach(GTK_GRID(grid), labelo2, 1, 2, 1, 1);
-
-    gtk_widget_set_hexpand(labelo2, TRUE);
-
-    gtk_widget_set_vexpand(labelo2, TRUE);
-
-
-    binco2 = gtk_button_new_with_label("Increase O2");
-
-    bdeco2 = gtk_button_new_with_label("Decrease O2");
-
-    bincco2 = gtk_button_new_with_label("Increase CO2");
-
-    bdecco2 = gtk_button_new_with_label("Decrease CO2");
-
-
-    gtk_grid_attach(GTK_GRID(grid), binco2, 0, 3, 1, 1);
-
-    gtk_widget_set_hexpand(binco2, TRUE);
-
-    gtk_widget_set_vexpand(binco2, TRUE);
-
-
-    gtk_grid_attach(GTK_GRID(grid), bdeco2, 1, 3, 1, 1);
-
-    gtk_widget_set_hexpand(bdeco2, TRUE);
-
-    gtk_widget_set_vexpand(bdeco2, TRUE);
-
-
-    gtk_grid_attach(GTK_GRID(grid), bincco2, 0, 4, 1, 1);
-
-    gtk_widget_set_hexpand(bincco2, TRUE);
-
-    gtk_widget_set_vexpand(bincco2, TRUE);
-
-
-    gtk_grid_attach(GTK_GRID(grid), bdecco2, 1, 4, 1, 1);
-
-    gtk_widget_set_hexpand(bdecco2, TRUE);
-
-    gtk_widget_set_vexpand(bdecco2, TRUE);
-
-
-    
-
-// Update when button is selected ensure signal gets sent to the function
-
-g_signal_connect(binco2, "clicked", G_CALLBACK(increase_o2), NULL);
-
-    g_signal_connect(bdeco2, "clicked", G_CALLBACK(decrease_o2), NULL);
-
-    g_signal_connect(bincco2, "clicked", G_CALLBACK(increase_co2), NULL);
-
-    g_signal_connect(bdecco2, "clicked", G_CALLBACK(decrease_co2), NULL);
-
-
-    gtk_widget_show_all(window);
-
+    gtk_window_set_title(GTK_WINDOW(window), "Tri-Gas Controller");
+    gtk_window_set_default_size(GTK_WINDOW(window), 1024, 600);
     gtk_window_fullscreen(GTK_WINDOW(window));
 
+    // Main vertical box
+    main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(window), main_vbox);
 
+    // Dropdown for page navigation
+    dropdown = gtk_combo_box_text_new();
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(dropdown), "Home");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(dropdown), "Sensor Dashboard");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(dropdown), "Calibration");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(dropdown), "File Setup");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), 0); // default to "Home"
+
+    gtk_box_pack_start(GTK_BOX(main_vbox), dropdown, FALSE, FALSE, 5);
+
+    // Create the stack
+    stack = gtk_stack_new();
+    gtk_stack_set_transition_type(GTK_STACK(stack), GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
+    gtk_stack_set_transition_duration(GTK_STACK(stack), 300);
+    gtk_box_pack_start(GTK_BOX(main_vbox), stack, TRUE, TRUE, 0);
+
+    // Home Page
+    GtkWidget *landing_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *logo = gtk_image_new_from_file("/home/avathompson/Downloads/testIMG1");
+    GtkWidget *welcome = gtk_label_new("Tri-Gas Controller");
+    gtk_box_pack_start(GTK_BOX(landing_page), logo, TRUE, TRUE, 20);
+    gtk_box_pack_start(GTK_BOX(landing_page), welcome, TRUE, TRUE, 10);
+
+    // Sensor Dashboard Page (your original grid)
+    GtkWidget *sensor_grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(sensor_grid), 10);
+    gtk_grid_set_column_spacing(GTK_GRID(sensor_grid), 10);
+
+    labelsample = gtk_label_new("Sample: 0");
+    labelco2 = gtk_label_new("Carbon Dioxide: ");
+    labelo2 = gtk_label_new("Oxygen: ");
+    labeltemp = gtk_label_new("Temperature: ");
+    labelhum = gtk_label_new("Humidity: ");
+
+    gtk_grid_attach(GTK_GRID(sensor_grid), labelsample, 0, 0, 2, 1);
+    gtk_grid_attach(GTK_GRID(sensor_grid), labeltemp, 0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(sensor_grid), labelhum, 1, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(sensor_grid), labelco2, 0, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(sensor_grid), labelo2, 1, 2, 1, 1);
+
+    GtkWidget *binco2 = gtk_button_new_with_label("Increase O2");
+    GtkWidget *bdeco2 = gtk_button_new_with_label("Decrease O2");
+    GtkWidget *bincco2 = gtk_button_new_with_label("Increase CO2");
+    GtkWidget *bdecco2 = gtk_button_new_with_label("Decrease CO2");
+
+    gtk_grid_attach(GTK_GRID(sensor_grid), binco2, 0, 3, 1, 1);
+    gtk_grid_attach(GTK_GRID(sensor_grid), bdeco2, 1, 3, 1, 1);
+    gtk_grid_attach(GTK_GRID(sensor_grid), bincco2, 0, 4, 1, 1);
+    gtk_grid_attach(GTK_GRID(sensor_grid), bdecco2, 1, 4, 1, 1);
+
+    g_signal_connect(binco2, "clicked", G_CALLBACK(increase_o2), NULL);
+    g_signal_connect(bdeco2, "clicked", G_CALLBACK(decrease_o2), NULL);
+    g_signal_connect(bincco2, "clicked", G_CALLBACK(increase_co2), NULL);
+    g_signal_connect(bdecco2, "clicked", G_CALLBACK(decrease_co2), NULL);
+
+    // Calibration Page
+    GtkWidget *calibration = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *cal_label = gtk_label_new("Calibration Page (Coming Soon)");
+    gtk_box_pack_start(GTK_BOX(calibration), cal_label, TRUE, TRUE, 10);
+
+    // File Setup Page
+    GtkWidget *file_setup = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *file_label = gtk_label_new("File Setup Page (Coming Soon)");
+    gtk_box_pack_start(GTK_BOX(file_setup), file_label, TRUE, TRUE, 10);
+
+    // Add pages to stack
+    gtk_stack_add_titled(GTK_STACK(stack), landing_page, "landing", "Home");
+    gtk_stack_add_titled(GTK_STACK(stack), sensor_grid, "sensors", "Sensor Dashboard");
+    gtk_stack_add_titled(GTK_STACK(stack), calibration, "calibration", "Calibration");
+    gtk_stack_add_titled(GTK_STACK(stack), file_setup, "file_setup", "File Setup");
+
+    // Signal for dropdown navigation
+    g_signal_connect(dropdown, "changed", G_CALLBACK(on_dropdown_changed), stack);
+
+    gtk_widget_show_all(window);
     g_timeout_add(1000, timer_callback, NULL);
-
 }
+
+
 
 
 int main(int argc, char **argv) {
