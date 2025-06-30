@@ -39,3 +39,30 @@ combobox:selected, combobox list, combobox popover {
     background-color: black;
     color: white;
 }
+
+#translucent-logo {
+    opacity: .5; /* Adjust between 0.0 (fully transparent) and 1.0 (opaque) */
+}
+
+#passcode-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+#oxygen-btn,
+#co2-btn {
+  min-width: 60px;
+  min-height: 30px;
+  font-size: 14px;
+  padding: 6px 10px;
+  background-color: #e0f7fa;
+  border-radius: 8px;
+  color: #00695c;
+}
+
+#oxygen-btn:hover,
+#co2-btn:hover {
+  background-color: #b2ebf2;
+  transition: background-color 0.3s ease;
+}
+

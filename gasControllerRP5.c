@@ -1,3 +1,11 @@
+#include "ui/landing_page.h"
+
+#include "ui/calibration_page.h"
+
+#include "ui/file_setup_page.h"
+
+#include "ui/passcode_page.h"
+
 #include <gtk/gtk.h> //Used to create graphical user interface 
 
 #include <stdio.h>
@@ -62,7 +70,7 @@
 #define DECREASEO2 2 // WiringPi pin 2 (GPIO 27) Physical Pin 13
 
 #define INCREASECO2 3 // WiringPi pin 3 (GPIO 22) Physical Pin 15
-
+#include "passcode_page.h"
 #define DECREASECO2 12 // WiringPi pin 12 (GPIO 10) Physical Pin 19
 
 
@@ -526,6 +534,8 @@ static void on_dropdown_changed(GtkComboBoxText *combo, gpointer user_data) {
         gtk_stack_set_visible_child_name(stack, "calibration");
     } else if (g_strcmp0(selected, "File Setup") == 0) {
         gtk_stack_set_visible_child_name(stack, "file_setup");
+    } else if (g_strcmp0(selected, "Passcode") == 0) {
+        gtk_stack_set_visible_child_name(stack, "passcode");
     }
 }
 
@@ -567,6 +577,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(dropdown), "Sensor Dashboard");
     gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(dropdown), "Calibration");
     gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(dropdown), "File Setup");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(dropdown), "Passcode");
     gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), 0); // default to "Home"
 
     gtk_box_pack_start(GTK_BOX(main_vbox), dropdown, FALSE, FALSE, 5);
@@ -578,11 +589,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_box_pack_start(GTK_BOX(main_vbox), stack, TRUE, TRUE, 0);
 
     // Home Page
-    GtkWidget *landing_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget *logo = gtk_image_new_from_file("/home/avathompson/Downloads/testIMG1");
-    GtkWidget *welcome = gtk_label_new("Tri-Gas Controller");
-    gtk_box_pack_start(GTK_BOX(landing_page), logo, TRUE, TRUE, 20);
-    gtk_box_pack_start(GTK_BOX(landing_page), welcome, TRUE, TRUE, 10);
+    GtkWidget *landing_page = create_landing_page();
+    
 
     // Sensor Dashboard Page (your original grid)
     GtkWidget *sensor_grid = gtk_grid_new();
@@ -617,20 +625,22 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(bdecco2, "clicked", G_CALLBACK(decrease_co2), NULL);
 
     // Calibration Page
-    GtkWidget *calibration = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget *cal_label = gtk_label_new("Calibration Page (Coming Soon)");
-    gtk_box_pack_start(GTK_BOX(calibration), cal_label, TRUE, TRUE, 10);
+    GtkWidget *calibration = create_calibration_page();
+
 
     // File Setup Page
-    GtkWidget *file_setup = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget *file_label = gtk_label_new("File Setup Page (Coming Soon)");
-    gtk_box_pack_start(GTK_BOX(file_setup), file_label, TRUE, TRUE, 10);
+    GtkWidget *file_setup = create_file_setup_page();
+    
+    //Passcodem Page
+    GtkWidget *passcode = create_passcode_page();   
+    
 
     // Add pages to stack
     gtk_stack_add_titled(GTK_STACK(stack), landing_page, "landing", "Home");
     gtk_stack_add_titled(GTK_STACK(stack), sensor_grid, "sensors", "Sensor Dashboard");
     gtk_stack_add_titled(GTK_STACK(stack), calibration, "calibration", "Calibration");
     gtk_stack_add_titled(GTK_STACK(stack), file_setup, "file_setup", "File Setup");
+    gtk_stack_add_titled(GTK_STACK(stack), passcode, "passcode", "Passcode");
 
     // Signal for dropdown navigation
     g_signal_connect(dropdown, "changed", G_CALLBACK(on_dropdown_changed), stack);
