@@ -79,9 +79,34 @@ combobox:focus {
 
 #bottom-time-label {
     font-size: 18px;
-    color: #CCCCCC;
+    color: white;
     margin-bottom: 10px;
 }
+
+/* Recolor the symbolic arrow images white */
+#up-img,
+#down-img {
+    color: white;
+}
+
+#sensor-log-tree {
+    font-size: 14px;
+    color: white;
+    background-color: #2b2b40;
+    border: none;
+    
+}
+
+
+
+#file-setup-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+}
+
+
 
 
 
