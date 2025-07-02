@@ -539,6 +539,17 @@ static void on_dropdown_changed(GtkComboBoxText *combo, gpointer user_data) {
     }
 }
 
+gboolean update_time_label(gpointer user_data) {
+    GtkLabel *label = GTK_LABEL(user_data);
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    char buffer[64];
+    strftime(buffer, sizeof(buffer), "%A %m/%d/%Y, %I:%M:%S %p", t);
+    gtk_label_set_text(label, buffer);
+    return TRUE;
+}
+
+
 static void activate(GtkApplication *app, gpointer user_data) {
     GtkWidget *window;
     GtkWidget *main_vbox;
@@ -641,7 +652,16 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_stack_add_titled(GTK_STACK(stack), calibration, "calibration", "Calibration");
     gtk_stack_add_titled(GTK_STACK(stack), file_setup, "file_setup", "File Setup");
     gtk_stack_add_titled(GTK_STACK(stack), passcode, "passcode", "Passcode");
+    
+       // Bottom label for date and time
+    GtkWidget *bottom_time_label = gtk_label_new(NULL);
+    gtk_widget_set_name(bottom_time_label, "bottom-time-label");
+    gtk_widget_set_halign(bottom_time_label, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(bottom_time_label, GTK_ALIGN_END);
+    gtk_box_pack_end(GTK_BOX(main_vbox), bottom_time_label, FALSE, FALSE, 10);
 
+    // Start timer to update bottom time label
+    g_timeout_add_seconds(1, update_time_label, bottom_time_label);
     // Signal for dropdown navigation
     g_signal_connect(dropdown, "changed", G_CALLBACK(on_dropdown_changed), stack);
 

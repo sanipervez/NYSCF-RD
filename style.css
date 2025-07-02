@@ -1,5 +1,5 @@
 window {
-    background-color: black;
+    background-color: #1e1e2f;
     color: white;
     font-family: "Sans", Sans-Serif;
     font-weight: bold;
@@ -11,7 +11,7 @@ label {
 }
 
 button {
-    background-color: red;
+    background-color: #4da6ff;
     color: white;
     font-weight: bold;
     border-radius: 10px;
@@ -20,28 +20,55 @@ button {
 }
 
 button:hover {
-    background-color: black;
+    background-color: #2C3E50;
 }
 
-/* === ComboBox (dropdown menu) styling === */
+/* ComboBox (dropdown menu) styling */
 combobox, combobox * {
-    background-color: red;
+    background-color: #4da6ff;
     color: white;
     font-weight: bold;
     padding: 4px;
+}
+
+/* Dropdown container background color (blue) */
+combobox popover {
+    background-color: #4da6ff;
+    color: white;
+}
+
+/* Dropdown list item hover style */
+combobox popover > box > list > row:hover {
+    background-color: #d9d9d9;
+    color: #00695c;
+    transition: background-color 0.3s ease;
 }
 
 combobox:focus {
     border: 2px solid white;
 }
 
-combobox:selected, combobox list, combobox popover {
-    background-color: black;
-    color: white;
+/* Buttons for oxygen and CO2 */
+#oxygen-btn,
+#co2-btn {
+  min-width: 60px;
+  min-height: 30px;
+  font-size: 14px;
+  padding: 6px 10px;
+  background-color:  #d9d9d9;
+  border-radius: 8px;
+  color: #00695c;
 }
 
+#oxygen-btn:hover,
+#co2-btn:hover {
+  background-color: #d9d9d9;
+  transition: background-color 0.3s ease;
+}
+
+/* Misc */
 #translucent-logo {
-    opacity: .5; /* Adjust between 0.0 (fully transparent) and 1.0 (opaque) */
+    opacity: .5;
 }
 
 #passcode-title {
@@ -49,20 +76,12 @@ combobox:selected, combobox list, combobox popover {
     font-weight: bold;
     color: white;
 }
-#oxygen-btn,
-#co2-btn {
-  min-width: 60px;
-  min-height: 30px;
-  font-size: 14px;
-  padding: 6px 10px;
-  background-color: #e0f7fa;
-  border-radius: 8px;
-  color: #00695c;
+
+#bottom-time-label {
+    font-size: 18px;
+    color: #CCCCCC;
+    margin-bottom: 10px;
 }
 
-#oxygen-btn:hover,
-#co2-btn:hover {
-  background-color: #b2ebf2;
-  transition: background-color 0.3s ease;
-}
+
 
