@@ -1,6 +1,6 @@
 window {
-    background-color: #1e1e2f;
-    color: white;
+    background-color: white;
+    color: black;
     font-family: "Sans", Sans-Serif;
     font-weight: bold;
 }
@@ -12,7 +12,7 @@ label {
 
 button {
     background-color: #4da6ff;
-    color: white;
+    color: black;
     font-weight: bold;
     border-radius: 10px;
     padding: 8px;
@@ -25,10 +25,10 @@ button:hover {
 
 /* ComboBox (dropdown menu) styling */
 combobox, combobox * {
-    background-color: #4da6ff;
-    color: white;
+    background-color: #dbe3f6;
+    color: black;
     font-weight: bold;
-    padding: 4px;
+    padding: 8px;
 }
 
 /* Dropdown container background color (blue) */
@@ -40,7 +40,7 @@ combobox popover {
 /* Dropdown list item hover style */
 combobox popover > box > list > row:hover {
     background-color: #d9d9d9;
-    color: #00695c;
+    color: black;
     transition: background-color 0.3s ease;
 }
 
@@ -49,64 +49,25 @@ combobox:focus {
 }
 
 /* Buttons for oxygen and CO2 */
-#oxygen-btn,
-#co2-btn {
-  min-width: 60px;
-  min-height: 30px;
-  font-size: 14px;
-  padding: 6px 10px;
-  background-color:  #d9d9d9;
-  border-radius: 8px;
-  color: #00695c;
+#oxygen_btn {
+    background-color: rgba(161, 243, 168, 0.7);
+    border-radius: 8px;
+    color: black;
+    padding: 6px 10px;
 }
 
-#oxygen-btn:hover,
-#co2-btn:hover {
-  background-color: #d9d9d9;
-  transition: background-color 0.3s ease;
+#co2_btn {
+    background-color: rgba(77, 166, 255, 0.7);
+    border-radius: 8px;
+    color: black;
+    padding: 6px 10px;
 }
 
-/* Misc */
-#translucent-logo {
-    opacity: .5;
-}
-
-#passcode-title {
-    font-size: 18px;
+/* Target the label inside the button to apply font-size */
+#oxygen_btn label,
+#co2_btn label {
+    font-size: 65px;
     font-weight: bold;
-    color: white;
+    color: black;
 }
-
-#bottom-time-label {
-    font-size: 18px;
-    color: white;
-    margin-bottom: 10px;
-}
-
-/* Recolor the symbolic arrow images white */
-#up-img,
-#down-img {
-    color: white;
-}
-
-#sensor-log-tree {
-    font-size: 14px;
-    color: white;
-    background-color: #2b2b40;
-    border: none;
-    
-}
-
-
-
-#file-setup-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 10px;
-}
-
-
-
-
 
