@@ -673,32 +673,18 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
 
 int main(int argc, char **argv) {
-
     GtkApplication *app;
-
     int status;
 
-// Main initializes everything to ensure it is functioning properly. 
+    initialize_gpio_pwm();             // Hardware setup
+    sensirion_i2c_hal_init();          // Sensor setup
 
-
-    initialize_gpio_pwm();
-
-
-    sensirion_i2c_hal_init();
-
-
-    app = gtk_application_new("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS); //creates GUI environment 
-
-    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
-
-//activate is called so that the GUI appears the way we programmed
+    app = gtk_application_new("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);  // GUI launches here
 
     status = g_application_run(G_APPLICATION(app), argc, argv);
 
     g_object_unref(app);
-
-//clean shutdown
-
     return status;
-
 }
+
