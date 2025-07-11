@@ -5,11 +5,6 @@ window {
     font-weight: bold;
 }
 
-label {
-    font-size: 16px;
-    font-weight: bold;
-}
-
 button {
     background-color: #4da6ff;
     color: black;
@@ -27,6 +22,7 @@ button:hover {
 combobox, combobox * {
     background-color: #dbe3f6;
     color: black;
+    font-size: 80px;
     font-weight: bold;
     padding: 8px;
 }
@@ -84,13 +80,23 @@ combobox:focus {
 }
 
 #passcode-button label {
-  font-size: 60px;
+  font-size: 80px;
   font-weight: bold;
 }
 
 
+#passcode-button:hover {
+  background-color: #1f78d1;  /* Darker blue on hover */
+}
+
+
 #passcode-title {
-  font-size: 36px;
+  font-size: 70px;
+  margin: 20px;
+}
+
+#digits {
+  font-size: 70px;
   margin: 20px;
 }
 
