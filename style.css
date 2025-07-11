@@ -100,4 +100,8 @@ combobox:focus {
   margin: 20px;
 }
 
+#bottom-time-label {
+    font-size: 40px
+}
+
 
