@@ -261,7 +261,6 @@ void update_sensor_readings() {
     }
 }
 
-// Adjustment dialog to allow editing CO2 or O2 percentage
 void show_adjustment_dialog(GtkWindow *parent, const char *title, double *value_ptr) {
     GtkWidget *dialog = gtk_dialog_new_with_buttons(title, parent,
         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -269,16 +268,14 @@ void show_adjustment_dialog(GtkWindow *parent, const char *title, double *value_
         "_OK", GTK_RESPONSE_OK,
         NULL);
 
-    // Make dialog fullscreen/modal (or set a large fixed size)
     gtk_window_fullscreen(GTK_WINDOW(dialog));
-    // Optionally, hide the title bar for a cleaner look:
-    // gtk_window_set_decorated(GTK_WINDOW(dialog), FALSE);
+    // Optionally: gtk_window_set_decorated(GTK_WINDOW(dialog), FALSE);
 
     GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
-    gtk_container_add(GTK_CONTAINER(content_area), vbox);
+    GtkWidget *main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(content_area), main_vbox);
 
-    // Create the value label
+    // Value label
     GtkLabel *value_label = GTK_LABEL(gtk_label_new(NULL));
     char buf[32];
     snprintf(buf, sizeof(buf), "%.1f %%", *value_ptr);
@@ -288,24 +285,30 @@ void show_adjustment_dialog(GtkWindow *parent, const char *title, double *value_
     gtk_widget_set_hexpand(GTK_WIDGET(value_label), TRUE);
     gtk_widget_set_vexpand(GTK_WIDGET(value_label), TRUE);
 
-    // Create arrow buttons, large and expanding
-    GtkWidget *up_btn = gtk_button_new_with_label("▲");
-    GtkWidget *down_btn = gtk_button_new_with_label("▼");
-    gtk_widget_set_name(up_btn, "arrow-btn");
-    gtk_widget_set_name(down_btn, "arrow-btn");
-    gtk_widget_set_halign(up_btn, GTK_ALIGN_CENTER);
-    gtk_widget_set_valign(up_btn, GTK_ALIGN_CENTER);
-    gtk_widget_set_hexpand(up_btn, TRUE);
-    gtk_widget_set_vexpand(up_btn, TRUE);
-    gtk_widget_set_halign(down_btn, GTK_ALIGN_CENTER);
-    gtk_widget_set_valign(down_btn, GTK_ALIGN_CENTER);
-    gtk_widget_set_hexpand(down_btn, TRUE);
-    gtk_widget_set_vexpand(down_btn, TRUE);
+    // Arrow buttons packed together in a sub-vbox
+    GtkWidget *arrow_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
-    // Pack widgets and allow them to fill the space
-    gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(value_label), TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), up_btn, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), down_btn, TRUE, TRUE, 0);
+    GtkWidget *upButton = gtk_button_new_with_label("▲");
+    GtkWidget *downButton = gtk_button_new_with_label("▼");
+    gtk_widget_set_name(upButton, "upButton");
+    gtk_widget_set_name(downButton, "downButton");
+    gtk_widget_set_halign(upButton, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(upButton, GTK_ALIGN_CENTER);
+    gtk_widget_set_vexpand(upButton, FALSE);   // Do NOT expand vertically
+    gtk_widget_set_hexpand(upButton, TRUE);
+
+    gtk_widget_set_halign(downButton, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(downButton, GTK_ALIGN_CENTER);
+    gtk_widget_set_vexpand(downButton, FALSE); // Do NOT expand vertically
+    gtk_widget_set_hexpand(downButton, TRUE);
+
+    // Add arrow buttons to arrow_vbox
+    gtk_box_pack_start(GTK_BOX(arrow_vbox), upButton, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(arrow_vbox), downButton, TRUE, TRUE, 0);
+
+    // Pack value label and arrow_vbox into main_vbox
+    gtk_box_pack_start(GTK_BOX(main_vbox), GTK_WIDGET(value_label), TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(main_vbox), arrow_vbox, FALSE, FALSE, 0);
 
     // Helper struct for callbacks
     typedef struct {
@@ -333,8 +336,8 @@ void show_adjustment_dialog(GtkWindow *parent, const char *title, double *value_
         gtk_label_set_text(d->value_label, buf);
     }
 
-    g_signal_connect(up_btn, "clicked", G_CALLBACK(up_clicked), &data);
-    g_signal_connect(down_btn, "clicked", G_CALLBACK(down_clicked), &data);
+    g_signal_connect(upButton, "clicked", G_CALLBACK(up_clicked), &data);
+    g_signal_connect(downButton, "clicked", G_CALLBACK(down_clicked), &data);
 
     gtk_widget_show_all(dialog);
 

@@ -109,3 +109,15 @@ GtkLabel {
     margin: 10px;
 }
 
+button#downButton, button#upButton{
+    background-color: #4da6ff;   
+    background-image: none;
+    color: white;                 
+    font-size: 80px;             
+    padding: 30px 50px;           
+    border-radius: 12px;          
+    border: none;
+    font-weight: bold;
+}
+
+
