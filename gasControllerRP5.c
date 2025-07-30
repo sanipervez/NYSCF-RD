@@ -269,11 +269,13 @@ void show_adjustment_dialog(GtkWindow *parent, const char *title, double *value_
         NULL);
 
     gtk_window_fullscreen(GTK_WINDOW(dialog));
-    // Optionally: gtk_window_set_decorated(GTK_WINDOW(dialog), FALSE);
 
     GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     GtkWidget *main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(content_area), main_vbox);
+
+    // Create a horizontal box for label and arrows
+    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
     // Value label
     GtkLabel *value_label = GTK_LABEL(gtk_label_new(NULL));
@@ -285,7 +287,7 @@ void show_adjustment_dialog(GtkWindow *parent, const char *title, double *value_
     gtk_widget_set_hexpand(GTK_WIDGET(value_label), TRUE);
     gtk_widget_set_vexpand(GTK_WIDGET(value_label), TRUE);
 
-    // Arrow buttons packed together in a sub-vbox
+    // Arrow buttons packed vertically in a sub-vbox
     GtkWidget *arrow_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     GtkWidget *upButton = gtk_button_new_with_label("▲");
@@ -294,21 +296,23 @@ void show_adjustment_dialog(GtkWindow *parent, const char *title, double *value_
     gtk_widget_set_name(downButton, "downButton");
     gtk_widget_set_halign(upButton, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(upButton, GTK_ALIGN_CENTER);
-    gtk_widget_set_vexpand(upButton, FALSE);   // Do NOT expand vertically
+    gtk_widget_set_vexpand(upButton, FALSE);
     gtk_widget_set_hexpand(upButton, TRUE);
 
     gtk_widget_set_halign(downButton, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(downButton, GTK_ALIGN_CENTER);
-    gtk_widget_set_vexpand(downButton, FALSE); // Do NOT expand vertically
+    gtk_widget_set_vexpand(downButton, FALSE);
     gtk_widget_set_hexpand(downButton, TRUE);
 
-    // Add arrow buttons to arrow_vbox
     gtk_box_pack_start(GTK_BOX(arrow_vbox), upButton, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(arrow_vbox), downButton, TRUE, TRUE, 0);
 
-    // Pack value label and arrow_vbox into main_vbox
-    gtk_box_pack_start(GTK_BOX(main_vbox), GTK_WIDGET(value_label), TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(main_vbox), arrow_vbox, FALSE, FALSE, 0);
+    // Pack label and arrows side-by-side in hbox
+    gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(value_label), TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), arrow_vbox, FALSE, FALSE, 0);
+
+    // Add the hbox to the main vertical box
+    gtk_box_pack_start(GTK_BOX(main_vbox), hbox, TRUE, TRUE, 0);
 
     // Helper struct for callbacks
     typedef struct {
@@ -317,6 +321,7 @@ void show_adjustment_dialog(GtkWindow *parent, const char *title, double *value_
     } AdjustmentData;
 
     AdjustmentData data = { value_ptr, value_label };
+    gtk_widget_set_name(GTK_WIDGET(value_label), "valueDisplayed");
 
     void up_clicked(GtkButton *button, gpointer user_data) {
         AdjustmentData *d = (AdjustmentData *)user_data;
