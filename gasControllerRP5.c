@@ -269,20 +269,80 @@ void show_adjustment_dialog(GtkWindow *parent, const char *title, double *value_
         "_OK", GTK_RESPONSE_OK,
         NULL);
 
-    GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    // Make dialog fullscreen/modal (or set a large fixed size)
+    gtk_window_fullscreen(GTK_WINDOW(dialog));
+    // Optionally, hide the title bar for a cleaner look:
+    // gtk_window_set_decorated(GTK_WINDOW(dialog), FALSE);
 
-    GtkAdjustment *adjustment = gtk_adjustment_new(*value_ptr, 0.0, 100.0, 0.1, 1.0, 0);
-    GtkWidget *spin_button = gtk_spin_button_new(adjustment, 0.1, 1);
-    gtk_container_add(GTK_CONTAINER(content_area), spin_button);
+    GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
+    gtk_container_add(GTK_CONTAINER(content_area), vbox);
+
+    // Create the value label
+    GtkLabel *value_label = GTK_LABEL(gtk_label_new(NULL));
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%.1f %%", *value_ptr);
+    gtk_label_set_text(value_label, buf);
+    gtk_widget_set_halign(GTK_WIDGET(value_label), GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(GTK_WIDGET(value_label), GTK_ALIGN_CENTER);
+    gtk_widget_set_hexpand(GTK_WIDGET(value_label), TRUE);
+    gtk_widget_set_vexpand(GTK_WIDGET(value_label), TRUE);
+
+    // Create arrow buttons, large and expanding
+    GtkWidget *up_btn = gtk_button_new_with_label("▲");
+    GtkWidget *down_btn = gtk_button_new_with_label("▼");
+    gtk_widget_set_name(up_btn, "arrow-btn");
+    gtk_widget_set_name(down_btn, "arrow-btn");
+    gtk_widget_set_halign(up_btn, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(up_btn, GTK_ALIGN_CENTER);
+    gtk_widget_set_hexpand(up_btn, TRUE);
+    gtk_widget_set_vexpand(up_btn, TRUE);
+    gtk_widget_set_halign(down_btn, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(down_btn, GTK_ALIGN_CENTER);
+    gtk_widget_set_hexpand(down_btn, TRUE);
+    gtk_widget_set_vexpand(down_btn, TRUE);
+
+    // Pack widgets and allow them to fill the space
+    gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(value_label), TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), up_btn, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), down_btn, TRUE, TRUE, 0);
+
+    // Helper struct for callbacks
+    typedef struct {
+        double *value_ptr;
+        GtkLabel *value_label;
+    } AdjustmentData;
+
+    AdjustmentData data = { value_ptr, value_label };
+
+    void up_clicked(GtkButton *button, gpointer user_data) {
+        AdjustmentData *d = (AdjustmentData *)user_data;
+        if (*(d->value_ptr) < 100.0)
+            *(d->value_ptr) += 0.1;
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%.1f %%", *(d->value_ptr));
+        gtk_label_set_text(d->value_label, buf);
+    }
+
+    void down_clicked(GtkButton *button, gpointer user_data) {
+        AdjustmentData *d = (AdjustmentData *)user_data;
+        if (*(d->value_ptr) > 0.0)
+            *(d->value_ptr) -= 0.1;
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%.1f %%", *(d->value_ptr));
+        gtk_label_set_text(d->value_label, buf);
+    }
+
+    g_signal_connect(up_btn, "clicked", G_CALLBACK(up_clicked), &data);
+    g_signal_connect(down_btn, "clicked", G_CALLBACK(down_clicked), &data);
 
     gtk_widget_show_all(dialog);
 
     int response = gtk_dialog_run(GTK_DIALOG(dialog));
     if (response == GTK_RESPONSE_OK) {
-        *value_ptr = gtk_spin_button_get_value(GTK_SPIN_BUTTON(spin_button));
+        // value_ptr is already updated by the arrows
         g_print("%s set to %.2f\n", title, *value_ptr);
     }
-
     gtk_widget_destroy(dialog);
 }
 
